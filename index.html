@@ -71,15 +71,30 @@
       async function predict() {
         const prediction = await model.predict(webcam.canvas);
         console.log(prediction);
-
+        
+        let max =0;
+        for (let i = 0; i < maxPredictions; i++) {
+           if(prediction[i].probability.toFixed(2)>prediction[max].probability.toFixed(2)){
+              max = i;
+          }
+        }
+        
         for (let i = 0; i < maxPredictions; i++) {
           const name = prediction[i].className;  //クラス名の取得
           const value = prediction[i].probability.toFixed(2); //認識率の取得
 
-          //判定結果を随時表示する
-          labelContainer.childNodes[i].innerHTML = `${name}: ${value}`;
+	  if(i==max){
+             //判定結果を随時表示する
+            labelContainer.childNodes[i].innerHTML = `<span style='color: red;'>${name}: ${value}</span>`;
+
+          }else{
+              
+            //判定結果を随時表示する
+            labelContainer.childNodes[i].innerHTML = `${name}: ${value}`;
+          }
         }
-      }
+
+　　　}
 
       //モデル予測の終了処理
       function stopCamera() {
