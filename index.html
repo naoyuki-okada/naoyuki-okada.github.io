@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Teachable Machine 基本サンプル</title>
+    <title>コケ識別器</title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
 
-    <h2>Teachable Machineの基本サンプル</h2>
-    <p>【スタート】ボタンをクリックしてください。Webカメラが起動するので手のカタチを「グー」「チョキ」「パー」にして認識できるか試してみましょう。<br>終了するときは【ストップ】ボタンをクリックします。</p>
+    <h2>コケ識別器</h2>
+    <p>【スタート】ボタンをクリックしてください。<br>カメラが起動するのでコケをかざしてみましょう(起動に少し時間がかかります）。<br>現在、「ハイゴケ」「スギゴケ」「シシゴケ」のみの識別に対応しています。<br>終了するときは【ストップ】ボタンをクリックします。</p>
     <button onclick="init()">スタート</button>
     <button onclick="stopCamera()">ストップ</button>
     
@@ -25,7 +25,7 @@
       const labelContainer = document.getElementById('label-container');
       
       //学習モデルをアップロードして生成されたURLに置き換えてください
-      const URL = "https://teachablemachine.withgoogle.com/models/KKtuN0n2H/";
+      const URL = "https://teachablemachine.withgoogle.com/models/x8tDtaAKd/";
 
       let model, webcam, maxPredictions, frame;
 
@@ -42,7 +42,8 @@
 
         //Webカメラの起動準備
         webcam = new tmImage.Webcam(200, 200);
-        await webcam.setup();
+        //await webcam.setup();
+        await webcam.setup({facingMode: 'environment'});
         await webcam.play();
 
         //Webカメラの映像を画面に表示する
