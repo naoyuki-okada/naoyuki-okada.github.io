@@ -5,15 +5,36 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+
+        video {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            visibility:hidden
+            /*visibility:hidden*/
+        }
+
+        canvas {
+            width: 200px;
+            height: 200px;
+            object-fit: cover
+        }
+    </style>
+
+
   </head>
   <body>
 
     <h2>コケ識別器</h2>
     <p>【スタート】ボタンをクリックしてください。<br>カメラが起動するのでコケをかざしてみましょう(起動に少し時間がかかります）。<br>現在、「ハイゴケ」「スギゴケ」「シシゴケ」のみの識別に対応しています。<br>終了するときは【ストップ】ボタンをクリックします。</p>
     <button onclick="init()">スタート</button>
-    <button onclick="stopCamera()">ストップ</button>
+    <button onclick="stopCamera()">ストップ</button><br>
     
-    <div id="webcam-container"></div>
+    <!--div id="webcam-container"></div-->
+    <canvas id="canvas" width="400" height="400" ></canvas>
+    <video id="video" width="400" height="400" autoplay muted playsinline="true"></video>
     <div id="label-container"></div>
 
     
@@ -22,15 +43,31 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
     <script>
+
+    var video = document.getElementById('video');
+    
+    
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+
+    var constraints = {
+        audio: false,
+        video: {
+            // スマホのバックカメラを使用
+            facingMode: 'environment'
+        }
+    };
+
       const labelContainer = document.getElementById('label-container');
       
       //学習モデルをアップロードして生成されたURLに置き換えてください
       const URL = "https://teachablemachine.withgoogle.com/models/x8tDtaAKd/";
 
-      let model, webcam, maxPredictions, frame;
+      let model, webcam, maxPredictions, frame,isRunning;
 
 
       async function init() {
+        isRunning = true;
         const modelURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
         const webcamContainer = document.getElementById('webcam-container');
@@ -41,17 +78,35 @@
         maxPredictions = model.getTotalClasses();
 
         //Webカメラの起動準備
-        webcam = new tmImage.Webcam(200, 200);
+        //webcam = new tmImage.Webcam(200, 200);
         //await webcam.setup();
-        await webcam.setup({facingMode: 'environment'});
-        await webcam.play();
+       // await webcam.setup({facingMode: 'environment'});
+        //await webcam.play();
 
         //Webカメラの映像を画面に表示する
-        webcamContainer.innerHTML = '';
-        webcamContainer.appendChild(webcam.canvas);
+        //webcamContainer.innerHTML = '';
+        //webcamContainer.appendChild(webcam.canvas);
+
+
+
+
+
+     //  カメラの映像を取得
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then((stream) => {
+            video.srcObject = stream;
+	video.onloadedmetadata = function() {
+            window.requestAnimationFrame(loop);
+            //console.log("camera");
+        };
+
+    })
+    .catch((err) => {
+       window.alert(err.name + ': ' + err.message);
+    });
 
         //モデル予測の繰り返し実行
-        window.requestAnimationFrame(loop);
+        //window.requestAnimationFrame(loop);
 
         //モデルにあるすべてのクラス要素にdivタグをつける
         for (let i = 0; i < maxPredictions; i++) {
@@ -61,15 +116,29 @@
 
       //モデル予測を繰り返し実行する
       async function loop() {
-        webcam.update();
+        //webcam.update();
+        // 描画をクリア
+        context.clearRect(0, 0,canvas.width, canvas.height);
+        // videoをcanvasにトレース
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+     
         await predict();
-        frame = window.requestAnimationFrame(loop);
+        
+        if(isRunning == true){
+           frame = window.requestAnimationFrame(loop);
+        //console.log(frame);
+        }else{
+          //window.cancelAnimationFrame(frame);
+          //video.srcObject = null;
+          console.log("stop");
+        }
       }
 
 
       //モデル予測処理
       async function predict() {
-        const prediction = await model.predict(webcam.canvas);
+        //const prediction = await model.predict(webcam.canvas);
+        const prediction = await model.predict(canvas);
         console.log(prediction);
         
         let max =0;
@@ -98,8 +167,12 @@
 
       //モデル予測の終了処理
       function stopCamera() {
-        webcam.stop();
-        window.cancelAnimationFrame(frame);
+         isRunning = false;
+        //webcam.stop();
+         //window.cancelAnimationFrame(frame);
+         //console.log("stop");
+        //labelContainer.innerHTML ="";
+        //video.srcObject = null;
       }
     </script>
   </body>
