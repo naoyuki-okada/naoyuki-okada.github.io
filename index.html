@@ -28,7 +28,7 @@
   <body>
 
     <h2>コケ識別器</h2>
-    <p>【スタート】ボタンをクリックしてください。<br>カメラが起動するのでコケをかざしてみましょう(起動に少し時間がかかります）。<br>現在、「ハイゴケ」「スギゴケ」「シシゴケ」のみの識別に対応しています。<br>終了するときは【ストップ】ボタンをクリックします。</p>
+    <p>【スタート】ボタンをクリックしてください。<br>カメラが起動するのでコケをかざしてみましょう(起動に少し時間がかかります）。<br>現在、「ハイゴケ」「スギゴケ」「シシゴケ」「クサゴケ」の識別に対応しています。<br>終了するときは【ストップ】ボタンをクリックします。</p>
     <button onclick="init()">スタート</button>
     <button onclick="stopCamera()">ストップ</button><br>
     
@@ -63,7 +63,6 @@
       
       //学習モデルをアップロードして生成されたURLに置き換えてください
       const URL = "https://teachablemachine.withgoogle.com/models/x8tDtaAKd/";
-
       let model, webcam, maxPredictions, frame,isRunning;
 
 
