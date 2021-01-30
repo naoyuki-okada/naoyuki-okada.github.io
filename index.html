@@ -97,6 +97,7 @@
         .then((stream) => {
             video.srcObject = stream;
 	video.onloadedmetadata = function() {
+            video.play();
             window.requestAnimationFrame(loop);
             //console.log("camera");
         };
